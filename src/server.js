@@ -6,9 +6,8 @@ const PORT = process.env.PORT;
 
 app.use(express.json());
 
-app.get("/", (req, res) => res.send("Welcome to cms API"))
-
+app.get("/", (req, res) => res.send("Welcome to cms API"));
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`);
 });
