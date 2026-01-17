@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Routes
+app.use("/api/v1/auth", authRoutes);
+
 app.get("/", (req, res) => {
   res.send("Welcome to CMS API 🚀");
 });
