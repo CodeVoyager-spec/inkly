@@ -17,14 +17,14 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true, 
+      required: true,
       unique: true,
       trim: true,
       lowercase: true,
     },
     password: {
       type: String,
-      required: true, 
+      required: true,
       select: false,
     },
     role: {
@@ -38,9 +38,8 @@ const userSchema = new mongoose.Schema(
       default: USER_STATUS.PENDING,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
