@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const { USER_ROLE, USER_STATUS } = require("../constants/user.constants");
+const { signAccessToken } = require("../utils/jwt.utils");
 
 /**
  * Signup Controller
@@ -73,6 +74,9 @@ exports.signin = catchAsync(async (req, res) => {
     throw new AppError("Your account is pending approval", 403);
   }
 
+  // Generate access token
+  const accessToken = signAccessToken({ id: user._id });
+
   // Successful login
   res.status(200).json({
     success: true,
@@ -82,6 +86,7 @@ exports.signin = catchAsync(async (req, res) => {
       email: user.email,
       role: user.role,
       status: user.status,
+      token: accessToken,
     },
   });
 });
