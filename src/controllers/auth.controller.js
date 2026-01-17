@@ -14,8 +14,8 @@ exports.signup = catchAsync(async (req, res) => {
   const { name, userId, email, password, role } = req.body;
 
   // Check if user already exists
-  const existingUser = await User.findOne({ userId });
-  if (existingUser) {
+  const user = await User.findOne({ userId });
+  if (user) {
     throw new AppError("User already exists", 409);
   }
 
@@ -44,6 +44,7 @@ exports.signup = catchAsync(async (req, res) => {
       email: newUser.email,
       role: newUser.role,
       status: newUser.status,
+      createdAt: newUser.createdAt
     },
   });
 });
@@ -53,6 +54,7 @@ exports.signup = catchAsync(async (req, res) => {
  * - Validates userId & password
  * - Verifies account status
  * - Allows login only if APPROVED
+ * - Generate access token
  */
 exports.signin = catchAsync(async (req, res) => {
   const { userId, password } = req.body;
