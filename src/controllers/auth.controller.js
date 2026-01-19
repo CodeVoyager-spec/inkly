@@ -30,9 +30,9 @@ exports.signup = catchAsync(async (req, res) => {
   }
 
   const status =
-    !role || role === USER_ROLE.AUTHOR
-      ? USER_STATUS.PENDING
-      : USER_STATUS.APPROVED;
+    !role || role === USER_ROLE.READER
+      ? USER_STATUS.APPROVED
+      : USER_STATUS.PENDING;
 
   const user = await User.create({ name, userId, email, password, role, status });
 

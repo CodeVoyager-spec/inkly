@@ -10,7 +10,11 @@ const USER_STATUS = {
   BANNED: "banned",
 };
 
+ALLOWED_USER_FIELDS = ["name", "userId", "email", "password", "role"];
+
+
 module.exports = {
   USER_ROLE,
   USER_STATUS,
+  ALLOWED_USER_FIELDS
 };
