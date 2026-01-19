@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   api:
     build: .
-    container_name: express_api
+    container_name: inkly-api
     ports:
       - "5000:5000"
     env_file:
@@ -16,7 +14,7 @@ services:
 
   mongo:
     image: mongo:7
-    container_name: mongo_db
+    container_name: inkly-mongo
     ports:
       - "27017:27017"
     volumes:
