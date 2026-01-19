@@ -13,19 +13,16 @@ const { signAccessToken } = require("../utils/jwt.utils");
 exports.signup = catchAsync(async (req, res) => {
   const { name, userId, email, password, role } = req.body;
 
-  // Check if user already exists
   const user = await User.findOne({ userId });
   if (user) {
     throw new AppError("User already exists", 409);
   }
 
-  // Determine user status based on role
   const status =
     !role || role === USER_ROLE.AUTHOR
       ? USER_STATUS.PENDING
       : USER_STATUS.APPROVED;
 
-  // Create new user
   const newUser = await User.create({
     name,
     userId,
@@ -35,7 +32,6 @@ exports.signup = catchAsync(async (req, res) => {
     status,
   });
 
-  // Send response
   res.status(201).json({
     success: true,
     data: {
@@ -59,15 +55,12 @@ exports.signup = catchAsync(async (req, res) => {
 exports.signin = catchAsync(async (req, res) => {
   const { userId, password } = req.body;
 
-  // Find user with password
   const user = await User.findOne({ userId }).select("+password");
 
-  // Invalid credentials
   if (!user || !(await user.comparePassword(password))) {
     throw new AppError("Invalid userId or password", 401);
   }
 
-  // Account status checks
   if (user.status === USER_STATUS.BANNED) {
     throw new AppError("Your account has been banned", 403);
   }
@@ -76,10 +69,8 @@ exports.signin = catchAsync(async (req, res) => {
     throw new AppError("Your account is pending approval", 403);
   }
 
-  // Generate access token
   const accessToken = signAccessToken({ id: user._id });
 
-  // Successful login
   res.status(200).json({
     success: true,
     data: {
