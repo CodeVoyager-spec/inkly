@@ -21,8 +21,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
     .select("-password")
     .skip(skip)
     .limit(+limit)
-    .sort({ createdAt: -1 })
-    .select("-password");
+    .sort({ createdAt: -1 });
 
   const total = await User.countDocuments(filter);
 
