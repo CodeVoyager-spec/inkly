@@ -17,6 +17,7 @@ const sanitizeUser = (user) => ({
 const STATUS_MESSAGES = {
   [USER_STATUS.BANNED]: "Your account has been banned",
   [USER_STATUS.PENDING]: "Your account is pending approval",
+  [USER_STATUS.DELETED]: "Your account has been deleted",
 };
 
 /**
