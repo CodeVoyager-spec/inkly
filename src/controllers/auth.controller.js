@@ -14,12 +14,6 @@ const sanitizeUser = (user) => ({
   createdAt: user.createdAt,
 });
 
-const STATUS_MESSAGES = {
-  [USER_STATUS.BANNED]: "Your account has been banned",
-  [USER_STATUS.PENDING]: "Your account is pending approval",
-  [USER_STATUS.DELETED]: "Your account has been deleted",
-};
-
 /**
  * Signup Controller
  */
@@ -35,7 +29,14 @@ exports.signup = catchAsync(async (req, res) => {
       ? USER_STATUS.APPROVED
       : USER_STATUS.PENDING;
 
-  const user = await User.create({ name, userId, email, password, role, status });
+  const user = await User.create({
+    name,
+    userId,
+    email,
+    password,
+    role,
+    status,
+  });
 
   res.status(201).json({
     success: true,
@@ -55,8 +56,16 @@ exports.signin = catchAsync(async (req, res) => {
     throw new AppError("Invalid userId or password", 401);
   }
 
-  if (user.status !== USER_STATUS.APPROVED) {
-    throw new AppError(STATUS_MESSAGES[user.status], 403);
+  if (user.status === USER_STATUS.PENDING) {
+    throw new AppError("Your account is pending approval", 403);
+  }
+
+  if (user.status === USER_STATUS.BANNED) {
+    throw new AppError("Your account has been banned", 403);
+  }
+
+  if (user.status === USER_STATUS.DELETED) {
+    throw new AppError("Your account has been deleted", 403);
   }
 
   const token = signAccessToken({ id: user._id });
