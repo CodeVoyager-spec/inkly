@@ -14,5 +14,4 @@ const USER_STATUS = {
 module.exports = {
   USER_ROLE,
   USER_STATUS,
-  ALLOWED_USER_FIELDS
 };

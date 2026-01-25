@@ -1,6 +1,5 @@
 services:
   inkly-api:
-    image: inkly
     build: .
     container_name: inkly-api
     ports:
@@ -11,8 +10,7 @@ services:
       - .:/app
       - inkly_node_modules:/app/node_modules
     depends_on:
-      inkly-mongo:
-        condition: service_healthy
+      - inkly-mongo
     command: npm run dev
     restart: unless-stopped
 
@@ -23,11 +21,6 @@ services:
       - "27017:27017"
     volumes:
       - inkly_mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     restart: unless-stopped
 
 volumes:
