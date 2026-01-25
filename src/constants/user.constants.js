@@ -8,10 +8,8 @@ const USER_STATUS = {
   PENDING: "pending",
   APPROVED: "approved",
   BANNED: "banned",
+  DELETED: "deleted"
 };
-
-ALLOWED_USER_FIELDS = ["name", "userId", "email", "password", "role"];
-
 
 module.exports = {
   USER_ROLE,
