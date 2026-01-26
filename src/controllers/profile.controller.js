@@ -19,10 +19,10 @@ exports.updateProfile = catchAsync(async (req, res) => {
   const user = await User.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
     runValidators: true,
-  }).select("-password");
+  });
 
   res.status(200).json({
-    message: "Profile updated",
+    message: "Your profile updated successfully",
     data: user,
   });
 });

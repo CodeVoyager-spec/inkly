@@ -9,7 +9,7 @@ const { USER_ROLE, USER_STATUS } = require("../constants/user.constants");
 exports.getAllUsers = catchAsync(async (req, res) => {
   const { role, status, page = 1, limit = 10 } = req.query;
 
-  const filter = { status: { $ne: USER_STATUS.DELETED } };
+  const filter = { };
   if (role) filter.role = role;
   if (status) filter.status = status;
 
@@ -31,7 +31,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
  * GET /users/:id (ADMIN)
  */
 exports.getUserById = catchAsync(async (req, res) => {
-  const user = await User.findActiveById(req.params.id).select("-password");
+  const user = await User.findActiveById(req.params.id);
 
   if (!user) throw new AppError("User not found", 404);
 
