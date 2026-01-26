@@ -19,8 +19,8 @@ const postSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      url: { type: String, required: true },
-      publicId: String, 
+      url: { type: String },
+      publicId: { type: String },
     },
     author: {
       type: mongoose.Schema.Types.ObjectId,
@@ -40,7 +40,7 @@ const postSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: Object.values(POST_STATUS), 
+      enum: Object.values(POST_STATUS),
       default: POST_STATUS.DRAFT,
     },
     publishedAt: {

@@ -1,3 +1,9 @@
+const Category = require("../models/category.model");
+const Tag = require("../models/tage.model");
+const Post = require("../models/post.model");
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/AppError");
+
 exports.createPost = catchAsync(async (req, res) => {
   const {
     title,
@@ -10,9 +16,7 @@ exports.createPost = catchAsync(async (req, res) => {
   // Fetch category and tags
   const [category, tags] = await Promise.all([
     Category.findById(categoryId).lean(),
-    tagIds.length
-      ? Tag.find({ _id: { $in: tagIds } }).distinct("_id")
-      : Promise.resolve([]),
+    tagIds.length ? Tag.find({ _id: { $in: tagIds } }).distinct("_id") : Promise.resolve([]),
   ]);
 
   if (!category) {
