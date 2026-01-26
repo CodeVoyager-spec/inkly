@@ -7,23 +7,18 @@ const { USER_ROLE, USER_STATUS } = require("../constants/user.constants");
  * GET /users (ADMIN)
  */
 exports.getAllUsers = catchAsync(async (req, res) => {
-
   const { role, status, page = 1, limit = 10 } = req.query;
 
-  const filter = { };
-
+  const filter = { status: { $ne: USER_STATUS.DELETED } };
   if (role) filter.role = role;
   if (status) filter.status = status;
 
   const skip = (page - 1) * limit;
 
-  const users = await User.find(filter)
-    .select("-password")
-    .skip(skip)
-    .limit(+limit)
-    .sort({ createdAt: -1 });
-
-  const total = await User.countDocuments(filter);
+  const [users, total] = await Promise.all([
+    User.find(filter).skip(skip).limit(+limit).sort({ createdAt: -1 }),
+    User.countDocuments(filter),
+  ]);
 
   res.status(200).json({
     success: true,
@@ -36,10 +31,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
  * GET /users/:id (ADMIN)
  */
 exports.getUserById = catchAsync(async (req, res) => {
-  const user = await User.findOne({
-    _id: req.params.id,
-    status: { $ne: USER_STATUS.DELETED },
-  }).select("-password");
+  const user = await User.findActiveById(req.params.id).select("-password");
 
   if (!user) throw new AppError("User not found", 404);
 
@@ -53,13 +45,12 @@ exports.getUserById = catchAsync(async (req, res) => {
  * PUT /users/:id (ADMIN)
  */
 exports.updateUser = catchAsync(async (req, res) => {
-  const user = await User.findOneAndUpdate(
-    { _id: req.params.id, status: { $ne: USER_STATUS.DELETED } },
-    req.body,
-    { new: true, runValidators: true },
-  ).select("-password");
+  const user = await User.findActiveById(req.params.id);
 
   if (!user) throw new AppError("User not found", 404);
+
+  Object.assign(user, req.body);
+  await user.save();
 
   res.status(200).json({
     message: "User updated successfully",
@@ -77,10 +68,7 @@ exports.updateUserRole = catchAsync(async (req, res) => {
     throw new AppError("Invalid role", 400);
   }
 
-  const user = await User.findOne({
-    _id: req.params.id,
-    status: { $ne: USER_STATUS.DELETED },
-  });
+  const user = await User.findActiveById(req.params.id);
 
   if (!user) throw new AppError("User not found", 404);
 
@@ -97,13 +85,9 @@ exports.updateUserRole = catchAsync(async (req, res) => {
  * PATCH /users/:id/ban (ADMIN)
  */
 exports.banUser = catchAsync(async (req, res) => {
-  const user = await User.findOne({
-    _id: req.params.id,
-    status: { $ne: USER_STATUS.DELETED },
-  });
+  const user = await User.findActiveById(req.params.id);
 
   if (!user) throw new AppError("User not found", 404);
-
   if (user.status === USER_STATUS.BANNED) {
     throw new AppError("User already banned", 400);
   }
@@ -118,10 +102,7 @@ exports.banUser = catchAsync(async (req, res) => {
  * DELETE /users/:id (ADMIN) – Soft delete
  */
 exports.deleteUser = catchAsync(async (req, res) => {
-  const user = await User.findOne({
-    _id: req.params.id,
-    status: { $ne: USER_STATUS.DELETED },
-  });
+  const user = await User.findActiveById(req.params.id);
 
   if (!user) throw new AppError("User not found", 404);
 

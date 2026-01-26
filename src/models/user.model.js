@@ -52,4 +52,12 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// Static method for soft-delete-safe lookup
+userSchema.statics.findActiveById = function (id) {
+  return this.findOne({
+    _id: id,
+    status: { $ne: USER_STATUS.DELETED },
+  });
+};
+
 module.exports = mongoose.model("User", userSchema);
