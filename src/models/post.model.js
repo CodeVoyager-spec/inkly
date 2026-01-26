@@ -18,6 +18,10 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    image: {
+      url: { type: String, required: true },
+      publicId: String, 
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -36,7 +40,7 @@ const postSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: Object.values(POST_STATUS), // e.g., DRAFT, PUBLISHED
+      enum: Object.values(POST_STATUS), 
       default: POST_STATUS.DRAFT,
     },
     publishedAt: {
@@ -44,18 +48,17 @@ const postSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-// Optional: Auto-generate slug from title
-postSchema.pre("save", function (next) {
+// Auto-generate slug from title
+postSchema.pre("save", function () {
   if (this.isModified("title")) {
     this.slug = this.title
       .toLowerCase()
       .replace(/[^\w ]+/g, "")
       .replace(/ +/g, "-");
   }
-  next();
 });
 
 module.exports = mongoose.model("Post", postSchema);

@@ -2,6 +2,7 @@ const express = require("express");
 const authRouter = require("./routes/auth.routes");
 const usersRouter = require("./routes/user.routes");
 const profileRouter = require("./routes/profile.routes");
+const postsRouter = require("./routes/post.routes");
 
 const app = express();
 
@@ -16,5 +17,6 @@ app.get("/", (req, res) => {
 app.use("/inkly/api/v1/auth", authRouter);
 app.use("/inkly/api/v1/users", usersRouter);
 app.use("/inkly/api/v1/profile", profileRouter);
+app.use("/inkly/api/v1/posts", postsRouter);
 
 module.exports = app;
