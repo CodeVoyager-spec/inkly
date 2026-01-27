@@ -6,7 +6,7 @@ const catchAsync = require("../utils/catchAsync");
  * Get logged-in user's account
  */
 exports.getProfile = catchAsync(async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
+  const user = await User.findById(req.user._id).select("-password");
   if (!user) throw new AppError("User not found", 404);
 
   res.status(200).json({ data: user });
@@ -16,7 +16,7 @@ exports.getProfile = catchAsync(async (req, res) => {
  * Update logged-in user's account
  */
 exports.updateProfile = catchAsync(async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+  const user = await User.findByIdAndUpdate(req.user._id, req.body, {
     new: true,
     runValidators: true,
   });
@@ -31,7 +31,7 @@ exports.updateProfile = catchAsync(async (req, res) => {
  * Deactivate logged-in user's account (soft delete)
  */
 exports.deleteMyProfile = catchAsync(async (req, res) => {
-  await User.findByIdAndUpdate(req.user.id, {
+  await User.findByIdAndUpdate(req.user._id, {
     status: USER_STATUS.DELETED,
   });
 
