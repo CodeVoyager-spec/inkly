@@ -1,92 +1,51 @@
 const Category = require("../models/category.model");
-const Tag = require("../models/tage.model");
+const Tag = require("../models/tag.model");
 const Post = require("../models/post.model");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
+const uploadImage = require("../utils/uploadImage");
+const { POST_STATUS } = require("../constants/post.constants");
 
 /**
- * Get category by ID or by name
- */
-const getCategory = async (category) => {
-  return mongoose.Types.ObjectId.isValid(category)
-    ? Category.findById(category)     
-    : Category.findOne({ name: category });
-};
-
-/**
- * Get tag IDs by IDs or by names
- */
-const getTags = async (tags = []) => {
-  if (!tags.length) return []; 
-
-  // check if all tags are ObjectIds
-  const areIds = tags.every((tag) =>
-    mongoose.Types.ObjectId.isValid(tag)
-  );
-
-  return areIds
-    ? Tag.find({ _id: { $in: tags } }).distinct("_id")  
-    : Tag.find({ name: { $in: tags } }).distinct("_id"); 
-};
-
-/**
- * Decide post status and published date
- */
-const getPostStatusAndPublishedAt = (status) => {
-
-  const postStatus = Object.values(POST_STATUS).includes(status)
-    ? status
-    : POST_STATUS.DRAFT;
-
-  const publishedAt =
-    postStatus === POST_STATUS.PUBLISHED ? new Date() : null;
-
-  return { postStatus, publishedAt };
-};
-
-/**
+ * POST /posts
  * Create a new blog post
+ * 1. Fetch category and tags
+ * 2. Upload image (optional)
+ * 3. Create post in database
+ * 4. Return created post
  */
 exports.createPost = catchAsync(async (req, res) => {
   const { title, content, category, tags = [], status } = req.body;
 
-  // fetch category and tags in parallel
-  const [foundCategory, foundTags] = await Promise.all([
-    getCategory(category),
-    getTags(tags),
-  ]);
+  const validStatuses = new Set(Object.values(POST_STATUS));
+  const postStatus = validStatuses.has(status) ? status : POST_STATUS.DRAFT;
+  const publishedAt = postStatus === POST_STATUS.PUBLISHED ? new Date() : null;
 
-  // category must exist
+  const foundCategory = await Category.findById(category);
   if (!foundCategory) {
-    throw new AppError(`Category not found: ${category}`, 404);
+    throw new AppError("Category not found", 404);
   }
 
-  // all tags must be valid
-  if (tags.length && foundTags.length !== tags.length) {
-    throw new AppError("One or more tags are invalid", 400);
+  let foundTags = [];
+  if (tags.length) {
+    foundTags = await Tag.find({ _id: { $in: tags } }).distinct("_id");
+    if (foundTags.length !== tags.length) {
+      throw new AppError("One or more tags are invalid", 400);
+    }
   }
 
-  // determine status and published date
-  const { postStatus, publishedAt } = getPostStatusAndPublishedAt(status);
-
-  // optional image upload
-  let image = null;
+  let uploadedImage = null;
   if (req.file) {
-    const uploadedImage = await uploadImage(req.file.buffer, "posts");
-    image = {
-      url: uploadedImage.secure_url,
-      publicId: uploadedImage.public_id,
-    };
+    uploadedImage = await uploadImage(req.file.buffer, "posts");
   }
 
-  // create post
   const post = await Post.create({
     title,
     content,
-    author: req.user.id,
+    author: req.user.id, 
     category: foundCategory._id,
     tags: foundTags,
-    image,
+    image: uploadedImage ? { url: uploadedImage.secure_url, publicId: uploadedImage.public_id } : null,
     status: postStatus,
     publishedAt,
   });
