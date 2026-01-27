@@ -1,15 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const postController = require("../controllers/post.controller");
-const { isAuthenticated, authorize } = require("../middlewares/auth.middleware");
+const {
+  isAuthenticated,
+  authorize,
+} = require("../middlewares/auth.middleware");
 const { uploadSingleImage } = require("../middlewares/upload.middleware");
 
 /**
- * Public routes
+ * Public / Role-aware Routes
+ * These routes work for guests as well as logged-in users
  */
-router.get("/search", postController.searchPosts);
-router.get("/", postController.getAllPosts);     
-router.get("/:slug", postController.getPostBySlug);
+router.get("/", postController.getAllPosts);       
+router.get("/search", postController.searchPosts); 
+router.get("/:slug", postController.getPostBySlug); 
 
 /**
  * Protected routes (Admin + Author)
@@ -19,7 +23,7 @@ router.post(
   isAuthenticated,
   authorize("admin", "author"),
   uploadSingleImage,
-  postController.createPost
+  postController.createPost,
 );
 
 router.put(
@@ -27,28 +31,28 @@ router.put(
   isAuthenticated,
   authorize("admin", "author"),
   uploadSingleImage,
-  postController.updatePost
+  postController.updatePost,
 );
 
 router.patch(
   "/:slug/publish",
   isAuthenticated,
   authorize("admin", "author"),
-  postController.publishPost
+  postController.publishPost,
 );
 
 router.patch(
   "/:slug/unpublish",
   isAuthenticated,
   authorize("admin", "author"),
-  postController.unpublishPost
+  postController.unpublishPost,
 );
 
 router.delete(
   "/:slug",
   isAuthenticated,
   authorize("admin", "author"),
-  postController.deletePost
+  postController.deletePost,
 );
 
 module.exports = router;

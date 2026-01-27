@@ -1,7 +1,7 @@
 const POST_STATUS = {
-  DRAFT: "DRAFT",
-  PUBLISHED: "PUBLISHED",
-  ARCHIVED: "ARCHIVED",
+  DRAFT: "draft",
+  PUBLISHED: "published",
+  ARCHIVED: "archived",
 };
 
 module.exports = { POST_STATUS };

@@ -243,13 +243,21 @@ exports.deletePost = catchAsync(async (req, res) => {
 
 /**
  * GET /posts/search
- * Public – Search published posts
+ * Public – Role-aware search
  */
 exports.searchPosts = catchAsync(async (req, res) => {
   const { q, category, tags, author, page = 1, limit = 10 } = req.query;
 
-  const filter = { status: POST_STATUS.PUBLISHED };
+  // Role-aware filter
+  const filter = req.user
+    ? req.user.role === "admin"
+      ? {}
+      : req.user.role === "author"
+        ? { $or: [{ status: POST_STATUS.PUBLISHED }, { author: req.user._id }] }
+        : { status: POST_STATUS.PUBLISHED }
+    : { status: POST_STATUS.PUBLISHED };
 
+  // Additional filters
   if (q) filter.$text = { $search: q };
   if (category) filter.category = category;
   if (tags) filter.tags = { $in: tags.split(",") };
