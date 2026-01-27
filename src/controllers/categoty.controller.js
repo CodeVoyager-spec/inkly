@@ -5,7 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 /**
  * Create category
  */
-const createCategory = catchAsync(async (req, res) => {
+exports.createCategory = catchAsync(async (req, res) => {
   const { name, description, parentCategory } = req.body;
 
   const category = await Category.create({
@@ -24,10 +24,8 @@ const createCategory = catchAsync(async (req, res) => {
 /**
  * Get all categories
  */
-const getAllCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find()
-    .populate("parentCategory")
-    .lean();
+exports.getAllCategories = catchAsync(async (req, res) => {
+  const categories = await Category.find().populate("parentCategory").lean();
 
   res.status(200).json({
     success: true,
@@ -39,7 +37,7 @@ const getAllCategories = catchAsync(async (req, res) => {
 /**
  * Get category by ID
  */
-const getCategoryById = catchAsync(async (req, res) => {
+exports.getCategoryById = catchAsync(async (req, res) => {
   const { categoryId } = req.params;
 
   const category = await Category.findById(categoryId)
@@ -59,7 +57,7 @@ const getCategoryById = catchAsync(async (req, res) => {
 /**
  * Update category
  */
-const updateCategory = catchAsync(async (req, res) => {
+exports.updateCategory = catchAsync(async (req, res) => {
   const { categoryId } = req.params;
   const { name, description, parentCategory } = req.body;
 
@@ -73,7 +71,7 @@ const updateCategory = catchAsync(async (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   if (!updatedCategory) {
@@ -90,7 +88,7 @@ const updateCategory = catchAsync(async (req, res) => {
 /**
  * Delete category
  */
-const deleteCategory = catchAsync(async (req, res) => {
+exports.deleteCategory = catchAsync(async (req, res) => {
   const { categoryId } = req.params;
 
   const deletedCategory = await Category.findByIdAndDelete(categoryId);
@@ -104,11 +102,3 @@ const deleteCategory = catchAsync(async (req, res) => {
     message: "Category deleted successfully",
   });
 });
-
-module.exports = {
-  createCategory,
-  getAllCategories,
-  getCategoryById,
-  updateCategory,
-  deleteCategory,
-};

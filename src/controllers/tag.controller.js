@@ -6,7 +6,7 @@ const catchAsync = require("../utils/catchAsync");
  * Create tag
  * (Admin or Author)
  */
-const createTag = catchAsync(async (req, res) => {
+exports.createTag = catchAsync(async (req, res) => {
   const { name } = req.body;
 
   const tag = await Tag.create({ name });
@@ -21,7 +21,7 @@ const createTag = catchAsync(async (req, res) => {
 /**
  * Get all tags
  */
-const getAllTags = catchAsync(async (req, res) => {
+exports.getAllTags = catchAsync(async (req, res) => {
   const tags = await Tag.find().lean();
 
   res.status(200).json({
@@ -34,7 +34,7 @@ const getAllTags = catchAsync(async (req, res) => {
 /**
  * Get tag by ID
  */
-const getTagById = catchAsync(async (req, res) => {
+exports.getTagById = catchAsync(async (req, res) => {
   const { tagId } = req.params;
 
   const tag = await Tag.findById(tagId).lean();
@@ -52,7 +52,7 @@ const getTagById = catchAsync(async (req, res) => {
 /**
  * Update tag
  */
-const updateTag = catchAsync(async (req, res) => {
+exports.updateTag = catchAsync(async (req, res) => {
   const { tagId } = req.params;
   const { name } = req.body;
 
@@ -79,7 +79,7 @@ const updateTag = catchAsync(async (req, res) => {
 /**
  * Delete tag
  */
-const deleteTag = catchAsync(async (req, res) => {
+exports.deleteTag = catchAsync(async (req, res) => {
   const { tagId } = req.params;
 
   const deletedTag = await Tag.findByIdAndDelete(tagId);
@@ -93,11 +93,3 @@ const deleteTag = catchAsync(async (req, res) => {
     message: "Tag deleted successfully",
   });
 });
-
-module.exports = {
-  createTag,
-  getAllTags,
-  getTagById,
-  updateTag,
-  deleteTag,
-};
